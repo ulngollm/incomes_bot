@@ -11,6 +11,8 @@ class State:
 
     def handleCommand(self):
         self.state = self.STATE_DEFAULT
+        if len(self.commands) == 0:
+            return None
         return self.commands.pop()
 
 
