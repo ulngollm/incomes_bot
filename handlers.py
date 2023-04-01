@@ -1,6 +1,8 @@
 from state import State
+from input import Input
+from storage import Storage
 state = State()
-import input as command_input
+storage = Storage()
 
 
 async def add(client, message):
@@ -12,8 +14,9 @@ async def add(client, message):
 
 
 async def today_sum(client, message):
+    sum = storage.get_today_sum()
     await message.reply(
-        "Ваши доходы за сегодня составили 0 руб."
+        "Ваши доходы за сегодня составили %s руб." % sum
     )
 
 async def week_sum(client, message):
@@ -32,8 +35,7 @@ async def read_input(client, message):
     await message.reply(
         "Ок"
     )
-    pass
 
 handlers = {
-    "add": command_input.add
+    "add": Input(storage).add
 }

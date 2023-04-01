@@ -13,7 +13,6 @@ BOT_API_TOKEN = os.getenv('BOT_API_TOKEN')
 
 app = Client('bot', API_ID, API_HASH, bot_token=BOT_API_TOKEN)
 
-INCOMES = []
 
 
 
