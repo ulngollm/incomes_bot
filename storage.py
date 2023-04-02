@@ -6,7 +6,7 @@ class Storage:
         self.repo = Repo('app.db')
 
     def add_income(self, income: Income) -> None:
-        self.repo.add(income.owner_id, income.name, income.value)
+        self.repo.add(income.owner_id, income.name, income.value, income.date)
 
     def get_today_sum(self, user_id) -> int:
         return self.repo.get_today(user_id)

@@ -7,6 +7,7 @@ class State:
     def __init__(self) -> None:
         self.state = self.STATE_DEFAULT
         self.commands = []
+        self.parameters = []
 
 
     def handleCommand(self):
@@ -16,6 +17,11 @@ class State:
         return self.commands.pop()
 
 
-    def readInput(self, command):
+    def readInput(self, command, parameters=None):
         self.state = self.STATE_INPUT
+        if parameters:
+            self.parameters.append(parameters)
         self.commands.append(command)
+
+    def get_parameters(self):
+        return self.parameters.pop()

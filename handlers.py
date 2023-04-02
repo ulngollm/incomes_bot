@@ -10,15 +10,16 @@ input = Input(storage)
 
 
 async def add(client, message):
+    date = message.command[1] if len(message.command) > 1 else None
     await message.reply(
         "Запишите название и сумму в формате `-100 название`. Валюту указывать не надо",
         parse_mode=ParseMode.MARKDOWN
     )
-    state.readInput('add')
+    state.readInput('add', date)
 
 
 
-async def today_sum(client, message):
+async def today_sum(client, message):    
     sum = storage.get_today_sum(message.from_user.id)
     await message.reply(
         "Ваш итог за сегодня %+d руб." % sum,
@@ -54,7 +55,7 @@ async def read_input(client, message):
         return
     
     handler =  handlers[lastCommand]
-    handler(message)
+    handler(message, state.get_parameters())
     await message.reply(
         "Ок"
     )
