@@ -21,7 +21,7 @@ async def add(client, message):
 async def today_sum(client, message):
     sum = storage.get_today_sum(message.from_user.id)
     await message.reply(
-        "Ваш итог за сегодня %s руб." % sum,
+        "Ваш итог за сегодня %+d руб." % sum,
         reply_markup=InlineKeyboardMarkup([
             [
                 InlineKeyboardButton(
