@@ -2,15 +2,15 @@ from storage import Storage
 from income import Income
 
 class Input:
-    def __init__(self, storage) -> None:
+    def __init__(self, storage: Storage) -> None:
         self.storage = storage
     
-    def add(self, text):
+    def add(self, message):
         # todo parse text
         # todo проверить регуляркой, того ли формата текст
         # todo нормализовать текст
-        [value, name] = text.split(" ", 1)
+        [value, name] = message.text.split(" ", 1)
         value = int(value)
-        self.storage.add_income(income=Income(name, value))
+        self.storage.add_income(income=Income(name, value, message.from_user.id))
 
     

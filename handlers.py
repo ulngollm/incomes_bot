@@ -6,6 +6,7 @@ from pyrogram.types import (InlineKeyboardMarkup,InlineKeyboardButton)
 
 state = State()
 storage = Storage()
+input = Input(storage)
 
 
 async def add(client, message):
@@ -18,7 +19,7 @@ async def add(client, message):
 
 
 async def today_sum(client, message):
-    sum = storage.get_today_sum()
+    sum = storage.get_today_sum(message.from_user.id)
     await message.reply(
         "Ваш итог за сегодня %s руб." % sum,
         reply_markup=InlineKeyboardMarkup([
@@ -46,14 +47,14 @@ async def read_input(client, message):
 
     # по умолчанию записывает новый расход
     if not lastCommand:
-        Input(storage).add(message.text)
+        input.add(message)
         await message.reply(
             "Ок"
         )
         return
     
     handler =  handlers[lastCommand]
-    handler(message.text)
+    handler(message)
     await message.reply(
         "Ок"
     )
@@ -61,9 +62,9 @@ async def read_input(client, message):
 async def button_handler(client, callback_query):
     # todo считать последюю команду, для которой должен быть обработчик
     await callback_query.message.reply(
-        '\n'.join(storage.get_today_list())
+        '\n'.join(storage.get_today_list(callback_query.from_user.id))
     )
 
 handlers = {
-    "add": Input(storage).add
+    "add": input.add
 }

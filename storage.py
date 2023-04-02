@@ -1,17 +1,18 @@
 from income import Income
+from db.queries import Repo
 
 class Storage:
     def __init__(self) -> None:
-        self.incomes = []
+        self.repo = Repo('app.db')
 
     def add_income(self, income: Income) -> None:
-        self.incomes.append(income)
+        self.repo.add(income.owner_id, income.name, income.value)
 
-    def get_today_sum(self) -> int:
-        # todo get today sum
-        return sum([x.value for x in self.incomes])
+    def get_today_sum(self, user_id) -> int:
+        return self.repo.get_today(user_id)
     
-    def get_today_list(self) -> list:
-        return ["%+d\t%s" % (x.value, x.name) for x in self.incomes]
+    def get_today_list(self, user_id) -> list:
+        result = self.repo.get_today_list(user_id)
+        return ["%+d\t%s" % (x[3], x[2]) for x in result]
     
     
