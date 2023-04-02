@@ -9,7 +9,7 @@ class Input:
         # todo parse text
         # todo проверить регуляркой, того ли формата текст
         # todo нормализовать текст
-        [value, name] = text.split(" ", 2)
+        [value, name] = text.split(" ", 1)
         value = int(value)
         self.storage.add_income(income=Income(name, value))
 
