@@ -41,4 +41,10 @@ class Repo():
         ''',
         (user,)).fetchone()
     
+
+    def get_month_sum(self, user) -> int:
+        return self.db.execute('''
+            SELECT sum(sum) from incomes where user_id = ? and date<=date('now') and date > date('now', '-1 month')
+        ''',
+        (user,)).fetchone()
     

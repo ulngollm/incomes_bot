@@ -20,4 +20,8 @@ class Storage:
         result = self.repo.get_week_sum(user_id)
         return result if result != None else 0
     
+    def get_month_sum(self, user_id) -> int:
+        result = self.repo.get_month_sum(user_id)
+        return result if result != None else 0
+    
     
