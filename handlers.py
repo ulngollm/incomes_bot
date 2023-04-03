@@ -20,6 +20,7 @@ async def add(client, message):
 
 
 async def today_sum(client, message):    
+    # todo set 0 if empty
     sum = storage.get_today_sum(message.from_user.id)
     await message.reply(
         "Ваш итог за сегодня %+d руб." % sum,
@@ -34,8 +35,9 @@ async def today_sum(client, message):
     )
 
 async def week_sum(client, message):
+    sum = storage.get_week_sum(message.from_user.id)
     await message.reply(
-        "Ваш итог за неделю 0 руб."
+        "Ваш итог за неделю %+d руб." % sum,
     )
 
 async def month_sum(client, message):

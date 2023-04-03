@@ -34,3 +34,11 @@ class Repo():
         ''',
         (user,)).fetchall()
     
+
+    def get_week_sum(self, user) -> int:
+        return self.db.execute('''
+            SELECT sum(sum) from incomes where user_id = ? and date<=date('now') and date > date('now', '-7 day')
+        ''',
+        (user,)).fetchone()
+    
+    
