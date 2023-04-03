@@ -24,4 +24,6 @@ class State:
         self.commands.append(command)
 
     def get_parameters(self):
-        return self.parameters.pop()
+        if len(self.parameters) > 1:
+            return self.parameters.pop()
+        return None
