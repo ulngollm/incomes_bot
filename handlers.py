@@ -2,13 +2,25 @@ from state import State
 from input import Input
 from storage import Storage
 from pyrogram.enums import ParseMode
-from pyrogram.types import (InlineKeyboardMarkup,InlineKeyboardButton)
+from pyrogram.types import (InlineKeyboardMarkup, InlineKeyboardButton)
+import auth
 
 state = State()
 storage = Storage()
 input = Input(storage)
 
 
+def check_access(func):
+    async def wrapper(client, message):
+        if not auth.Access.check_access(message.from_user.id):
+            await message.reply('Доступ запрещен. Обратитесь к владельцу, чтобы получить доступ.')
+            return
+        await func(client, message)
+    return wrapper
+    
+
+
+@check_access
 async def add(client, message):
     date = message.command[1] if len(message.command) > 1 else None
     await message.reply(
@@ -18,7 +30,7 @@ async def add(client, message):
     state.readInput('add', date)
 
 
-
+@check_access
 async def today_sum(client, message):    
     sum = storage.get_today_sum(message.from_user.id)
     await message.reply(
@@ -33,18 +45,23 @@ async def today_sum(client, message):
         ])
     )
 
+
+@check_access
 async def week_sum(client, message):
     sum = storage.get_week_sum(message.from_user.id)
     await message.reply(
         "Ваш итог за неделю %+d руб." % sum,
     )
 
+
+@check_access
 async def month_sum(client, message):
     sum = storage.get_month_sum(message.from_user.id)
     await message.reply(
         "Ваш итог за месяц %+d руб." % sum,
     )
 
+@check_access
 async def read_input(client, message):
     lastCommand = state.handleCommand()
 
