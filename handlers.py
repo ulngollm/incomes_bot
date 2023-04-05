@@ -33,6 +33,7 @@ async def add(client, message):
 @check_access
 async def today_sum(client, message):    
     sum = storage.get_today_sum(message.from_user.id)
+    print(sum)
     await message.reply(
         "Ваш итог за сегодня %+d руб." % sum,
         reply_markup=InlineKeyboardMarkup([
@@ -49,6 +50,7 @@ async def today_sum(client, message):
 @check_access
 async def week_sum(client, message):
     sum = storage.get_week_sum(message.from_user.id)
+    print(sum)
     await message.reply(
         "Ваш итог за неделю %+d руб." % sum,
     )
@@ -57,6 +59,7 @@ async def week_sum(client, message):
 @check_access
 async def month_sum(client, message):
     sum = storage.get_month_sum(message.from_user.id)
+    print(sum)
     await message.reply(
         "Ваш итог за месяц %+d руб." % sum,
     )
