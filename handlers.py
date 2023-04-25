@@ -4,6 +4,7 @@ from storage import Storage
 from pyrogram.enums import ParseMode
 from pyrogram.types import (InlineKeyboardMarkup, InlineKeyboardButton)
 import auth
+from pyrogram import Client
 
 state = State()
 storage = Storage()
@@ -79,12 +80,20 @@ async def read_input(client, message):
         "Ок"
     )
 
-async def button_handler(client, callback_query):
+async def button_handler(client: Client, callback_query):
     # todo считать последюю команду, для которой должен быть обработчик
-    await callback_query.message.reply(
-        '\n'.join(storage.get_today_list(callback_query.from_user.id))
-    )
+    if callback_query.data == 'today.list':
+        await callback_query.message.reply(
+            '\n'.join(storage.get_today_list(callback_query.from_user.id))
+        )
+        return
+    if callback_query.data == 'reject':
+        print('Отказался')
+        await client.send_message(692696840, 'Пользователь отказался от бота.')
+        await callback_query.message.reply('Ок, принято. Без проблем.')
+
+
 
 handlers = {
-    "add": input.add
+    "add": input.add,
 }
