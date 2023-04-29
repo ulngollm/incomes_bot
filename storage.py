@@ -2,8 +2,8 @@ from income import Income
 from db.queries import Repo
 
 class Storage:
-    def __init__(self) -> None:
-        self.repo = Repo('app.db')
+    def __init__(self, db_name) -> None:
+        self.repo = Repo(db_name)
 
     def add_income(self, income: Income) -> None:
         self.repo.add(income.owner_id, income.name, income.value, income.date)

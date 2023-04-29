@@ -1,7 +1,11 @@
 import sqlite3
+from dotenv import load_dotenv
+import os
 
-# todo remove hardcode
-conn = sqlite3.connect('app.db')
+load_dotenv()
+
+DB_NAME = os.getenv('DB_NAME')
+conn = sqlite3.connect(DB_NAME)
 
 cursor = conn.cursor()
 
