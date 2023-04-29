@@ -4,9 +4,10 @@ from storage import Storage
 from pyrogram.enums import ParseMode
 from pyrogram.types import (InlineKeyboardMarkup, InlineKeyboardButton)
 import auth
+from config import DB_NAME
 
 state = State()
-storage = Storage()
+storage = Storage(DB_NAME)
 input = Input(storage)
 
 
