@@ -65,14 +65,14 @@ async def read_input(client, message):
     if not lastCommand:
         input.add(message)
         await message.reply(
-            "✅"
+            "Сохранено ✅"
         )
         return
     
     handler =  handlers[lastCommand]
     handler(message, state.get_parameters())
     await message.reply(
-        "✅"
+        "Сохранено ✅"
     )
 
 async def button_handler(client, callback_query):
