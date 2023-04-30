@@ -7,7 +7,7 @@ from config import API_ID, API_HASH, BOT_API_TOKEN
 app = Client('bot', API_ID, API_HASH, bot_token=BOT_API_TOKEN)
 
 
-
+app.add_handler(MessageHandler(help, filters.command(['help'])))
 app.add_handler(MessageHandler(add, filters.command(['add'])))
 app.add_handler(MessageHandler(today_sum, filters.command(['today'])))
 app.add_handler(MessageHandler(week_sum, filters.command(['week'])))

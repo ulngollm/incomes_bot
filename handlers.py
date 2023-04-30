@@ -21,13 +21,15 @@ def check_access(func):
     
 
 
-@check_access
 async def add(client, message):
     date = message.command[1] if len(message.command) > 1 else None
+    await message.reply(
+        "Напишите транзакцию в формате `+1000 перевод`",
+        parse_mode=ParseMode.MARKDOWN
+    )
     state.readInput('add', date)
 
 
-@check_access
 async def today_sum(client, message):    
     sum = storage.get_today_sum(message.from_user.id)
     await message.reply(
@@ -43,7 +45,6 @@ async def today_sum(client, message):
     )
 
 
-@check_access
 async def week_sum(client, message):
     sum = storage.get_week_sum(message.from_user.id)
     await message.reply(
@@ -51,14 +52,12 @@ async def week_sum(client, message):
     )
 
 
-@check_access
 async def month_sum(client, message):
     sum = storage.get_month_sum(message.from_user.id)
     await message.reply(
         "Ваш итог за месяц %+d руб." % sum,
     )
 
-@check_access
 async def read_input(client, message):
     lastCommand = state.handleCommand()
 
@@ -85,7 +84,22 @@ async def button_handler(client, callback_query):
 
 def default_handler(client, message):
     message.reply(
-        "Вы хотели записать новую транзакцию? Этот бот понимает формат `[сумма][описание]` \nНапример, `-100 транспорт` \nСумму пишите без валюты. Между знаком и числом не должно быть пробелов",
+        "Вы хотели записать новую транзакцию? Этот бот понимает формат `[сумма][описание]` \nНапример, `-100 транспорт`",
+        parse_mode=ParseMode.MARKDOWN
+    )
+
+
+def help(client, message):
+    message.reply(
+    """
+Чтобы записать транзакцию, напишите сумму и ее описание через пробел, например `0 какая-то транзакция`.
+Для суммы можно использовать знаки `-+`, например, 
+`+1000 доход` или `-200 расход`. 
+Валюту не указывайте.  
+Между знаком и числом не должно быть пробелов. Сообщение вида `- 100 расход` бот попросит вас исправить.
+
+По умолчанию бот добавляет транзакции за сегодня. Чтобы добавить за другой день, пишите `/add дд.мм.гггг`, например `/add 20.04.2023`.
+    """,
         parse_mode=ParseMode.MARKDOWN
     )
 
