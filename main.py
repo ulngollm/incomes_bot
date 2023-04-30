@@ -13,7 +13,13 @@ app.add_handler(MessageHandler(today_sum, filters.command(['today'])))
 app.add_handler(MessageHandler(week_sum, filters.command(['week'])))
 app.add_handler(MessageHandler(month_sum, filters.command(['month'])))
 
-app.add_handler(MessageHandler(read_input, filters.text))
+app.add_handler(MessageHandler(
+    read_input, 
+    filters.regex('^(?P<sum>[+-]?\d+)?\s+(?P<desc>.*)$'))
+)
+
+# важно, чтобы обработчик с самой низкой специфичностью был последним
+app.add_handler(MessageHandler(default_handler, filters.text))
 app.add_handler(CallbackQueryHandler(button_handler))
 
 app.run()

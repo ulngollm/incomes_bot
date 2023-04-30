@@ -24,10 +24,6 @@ def check_access(func):
 @check_access
 async def add(client, message):
     date = message.command[1] if len(message.command) > 1 else None
-    await message.reply(
-        "Запишите название и сумму в формате `-100 название`. Валюту указывать не надо",
-        parse_mode=ParseMode.MARKDOWN
-    )
     state.readInput('add', date)
 
 
@@ -84,6 +80,13 @@ async def button_handler(client, callback_query):
     # todo считать последюю команду, для которой должен быть обработчик
     await callback_query.message.reply(
         '\n'.join(storage.get_today_list(callback_query.from_user.id))
+    )
+
+
+def default_handler(client, message):
+    message.reply(
+        "Вы хотели записать новую транзакцию? Этот бот понимает формат `[сумма][описание]` \nНапример, `-100 транспорт` \nСумму пишите без валюты. Между знаком и числом не должно быть пробелов",
+        parse_mode=ParseMode.MARKDOWN
     )
 
 handlers = {
