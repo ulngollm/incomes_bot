@@ -16,7 +16,7 @@ class Repo():
 
     def get_today(self, user) -> int:
         return self.db.execute('''
-            SELECT sum(sum) from incomes where user_id = ? and date=date('now')
+            SELECT sum(sum) from incomes where user_id = ? and date=date('now', 'localtime')
         ''',
         (user,)).fetchone()
     
@@ -30,21 +30,21 @@ class Repo():
 
     def get_today_list(self, user) -> int:
         return self.db.execute('''
-            SELECT * from incomes where user_id = ? and date=date('now')
+            SELECT * from incomes where user_id = ? and date=date('now', 'localtime')
         ''',
         (user,)).fetchall()
     
 
     def get_week_sum(self, user) -> int:
         return self.db.execute('''
-            SELECT sum(sum) from incomes where user_id = ? and date<=date('now') and date >= date('now', '-7 day', 'weekday 1')
+            SELECT sum(sum) from incomes where user_id = ? and date<=date('now', 'localtime') and date >= date('now', '-7 day', 'weekday 1')
         ''',
         (user,)).fetchone()
     
 
     def get_month_sum(self, user) -> int:
         return self.db.execute('''
-            SELECT sum(sum) from incomes where user_id = ? and date<=date('now') and date >= date('now', 'start of month')
+            SELECT sum(sum) from incomes where user_id = ? and date <= date('now', 'localtime') and date >= date('now', 'localtime', 'start of month')
         ''',
         (user,)).fetchone()
     
