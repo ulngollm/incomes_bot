@@ -1,11 +1,13 @@
 package main
 
 import (
+	repo "cost-bot/repository"
 	"fmt"
 	"log"
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -18,12 +20,6 @@ func init() {
 		log.Fatalf("Some error occured. Err: %s", err)
 		return
 	}
-}
-
-type Transaction struct {
-	Sum int
-	Description string
-	Date time.Time
 }
 
 
@@ -40,21 +36,28 @@ func main() {
 	}
 
 	b.Handle("/today", func(c tele.Context) error {
-		transactions := []Transaction{}
+		transactions := repo.GetTodayList()
+		messageTitle := "Today's transactions"
+		message := fmt.Sprintf("%s: \n\n%v", messageTitle, formatTransactions(transactions))
 
-		return c.Send(fmt.Sprintf("Today's transactions: %v", transactions))
+		return c.Send(message)
 	})
 
 	b.Handle("/week", func(c tele.Context) error {
-		transactions := []Transaction{}
+		transactions := repo.GetWeekList()
 
-		return c.Send(fmt.Sprintf("Weeks's transactions: %v", transactions))
+		messageTitle := "Weeks's transactions"
+		message := fmt.Sprintf("%s: \n\n%v", messageTitle, formatTransactions(transactions))
+
+		return c.Send(message)
 	})
 
 	b.Handle("/month", func(c tele.Context) error {
-		transactions := []Transaction{}
+		transactions := repo.GetMonthList()
+		messageTitle := "Month's transactions"
+		message := fmt.Sprintf("%s: \n\n%v", messageTitle, formatTransactions(transactions))
 
-		return c.Send(fmt.Sprintf("Month's transactions: %v", transactions))
+		return c.Send(message)
 	})
 
 	b.Handle(tele.OnText, saveTransaction, CheckFormat)
@@ -72,12 +75,12 @@ func saveTransaction(c tele.Context) error {
 
 	sum, _ := strconv.Atoi(found[0][1])
 
-	t := Transaction{
+	t := repo.Transaction{
 		Sum: sum,
 		Description: found[0][2],
 		Date: time.Now(),
 	}
-	fmt.Printf("%v", t)
+	repo.SaveTransaction(t)
 
 	return c.Send("Save!")
 }
@@ -97,4 +100,13 @@ func CheckFormat(next tele.HandlerFunc) tele.HandlerFunc {
 
 		return next(c)
 	}
+}
+
+func formatTransactions(transactions []repo.Transaction) string {
+	fmtTransactions := make([]string, len(transactions))
+	for i, t := range transactions {
+		fmtTransactions[i] = fmt.Sprintf("%d %s", t.Sum, t.Description)
+	}
+
+	return strings.Join(fmtTransactions, "\n")
 }
