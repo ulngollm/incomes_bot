@@ -41,8 +41,19 @@ func main() {
 			log.Fatal(err)
 		}
 
+		sum, err := repo.GetTodaySum()
+		if err != nil {
+			log.Fatal(err)
+		}
+		
+		// todo как показать кнопку
 		messageTitle := "Today's transactions"
-		message := fmt.Sprintf("%s: \n\n%v", messageTitle, formatTransactions(transactions))
+		message := fmt.Sprintf(
+			"%s: \n\nTotal: %d\n\n%v", 
+			messageTitle, 
+			sum,
+			formatTransactions(transactions),
+		)
 
 		return c.Send(message)
 	})
@@ -53,8 +64,18 @@ func main() {
 			log.Fatal(err)
 		}
 
+		sum, err := repo.GetWeekSum()
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		messageTitle := "Weeks's transactions"
-		message := fmt.Sprintf("%s: \n\n%v", messageTitle, formatTransactions(transactions))
+		message := fmt.Sprintf(
+			"%s: \n\nTotal: %d\n\n%v", 
+			messageTitle, 
+			sum,
+			formatTransactions(transactions),
+		)
 
 		return c.Send(message)
 	})
@@ -64,8 +85,19 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		sum, err := repo.GetMonthSum()
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		messageTitle := "Month's transactions"
-		message := fmt.Sprintf("%s: \n\n%v", messageTitle, formatTransactions(transactions))
+		message := fmt.Sprintf(
+			"%s: \n\nTotal: %d\n\n%v", 
+			messageTitle, 
+			sum,
+			formatTransactions(transactions),
+		)
 
 		return c.Send(message)
 	})
@@ -111,6 +143,7 @@ func CheckFormat(next tele.HandlerFunc) tele.HandlerFunc {
 		return next(c)
 	}
 }
+
 
 func formatTransactions(transactions []repo.Transaction) string {
 	if len(transactions) == 0 {
