@@ -36,7 +36,11 @@ func main() {
 	}
 
 	b.Handle("/today", func(c tele.Context) error {
-		transactions := repo.GetTodayList()
+		transactions, err := repo.GetTodayList()
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		messageTitle := "Today's transactions"
 		message := fmt.Sprintf("%s: \n\n%v", messageTitle, formatTransactions(transactions))
 
@@ -44,7 +48,10 @@ func main() {
 	})
 
 	b.Handle("/week", func(c tele.Context) error {
-		transactions := repo.GetWeekList()
+		transactions, err := repo.GetWeekList()
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		messageTitle := "Weeks's transactions"
 		message := fmt.Sprintf("%s: \n\n%v", messageTitle, formatTransactions(transactions))
@@ -53,7 +60,10 @@ func main() {
 	})
 
 	b.Handle("/month", func(c tele.Context) error {
-		transactions := repo.GetMonthList()
+		transactions, err := repo.GetMonthList()
+		if err != nil {
+			log.Fatal(err)
+		}
 		messageTitle := "Month's transactions"
 		message := fmt.Sprintf("%s: \n\n%v", messageTitle, formatTransactions(transactions))
 
@@ -78,7 +88,7 @@ func saveTransaction(c tele.Context) error {
 	t := repo.Transaction{
 		Sum: sum,
 		Description: found[0][2],
-		Date: time.Now(),
+		CreatedAt: time.Now().Format("2006-01-02"),
 	}
 	repo.SaveTransaction(t)
 
@@ -103,6 +113,10 @@ func CheckFormat(next tele.HandlerFunc) tele.HandlerFunc {
 }
 
 func formatTransactions(transactions []repo.Transaction) string {
+	if len(transactions) == 0 {
+		return "no transactions"
+	}
+
 	fmtTransactions := make([]string, len(transactions))
 	for i, t := range transactions {
 		fmtTransactions[i] = fmt.Sprintf("%d %s", t.Sum, t.Description)

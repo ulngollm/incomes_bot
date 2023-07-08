@@ -1,36 +1,55 @@
 package repository
 
-import "time"
+import (
+	"time"
 
+	"gorm.io/gorm"
+)
 
 type Transaction struct {
-	Sum int
+	gorm.Model
+	CreatedAt   string
+	Sum         int
 	Description string
-	Date time.Time
 }
 
-var transactions = []Transaction{
-	{Sum: -10, Description: "Hoa"},
-	{Sum: 10, Description: "Hadd"},
-	{Sum: 10, Description: "Uoa"},
-	{Sum: +120, Description: "Haw"},
-	{Sum: 10, Description: "Opdd"},
-	{Sum: -150, Description: "Has"},
+func GetTodayList() ([]Transaction, error) {
+	var transactions []Transaction
+	result := db.Find(
+		&transactions,
+		"created_at = ?",
+		time.Now().Format("2006-01-02"),
+	)
+
+	return transactions, result.Error
 }
 
-func GetTodayList() []Transaction {
-	return transactions
+// todo add summaries
+
+func GetWeekList() ([]Transaction, error) {
+	var transactions []Transaction
+	result := db.Where(
+		"created_at > ? AND created_at <= ?",
+		time.Now().AddDate(0, 0, -7).Format("2006-01-02"),
+		time.Now().Format("2006-01-02"),
+	).Find(&transactions)
+
+	return transactions, result.Error
 }
 
-func GetWeekList() []Transaction {
-	return transactions
+func GetMonthList() ([]Transaction, error) {
+	var transactions []Transaction
+	result := db.Where(
+		"created_at > ? AND created_at <= ?",
+		time.Now().AddDate(0, -1, 0).Format("2006-01-02"),
+		time.Now().Format("2006-01-02"),
+	).Find(&transactions)
+
+	return transactions, result.Error
 }
 
-func GetMonthList() []Transaction {
-	return transactions
-}
+func SaveTransaction(t Transaction) (Transaction, error) {
+	result := db.Create(&t)
 
-func SaveTransaction(t Transaction) error {
-	transactions = append(transactions, t)
-	return nil
+	return t, result.Error
 }
