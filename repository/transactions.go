@@ -37,6 +37,7 @@ func GetWeekList() ([]Transaction, error) {
 	var transactions []Transaction
 	result := db.Where(
 		"date > ? AND date <= ?",
+		// todo change to start of week
 		time.Now().AddDate(0, 0, -7).Format("2006-01-02"),
 		time.Now().Format("2006-01-02"),
 	).Find(&transactions)
@@ -46,10 +47,23 @@ func GetWeekList() ([]Transaction, error) {
 
 func GetWeekSum() (int, error) {
 	var sum int
+	today := time.Now()
+
+	// fix
+	//start week from monday
+	todayWeekday := today.Weekday() - 1
+	if todayWeekday < 0 {
+		todayWeekday = 7
+	}
+	daysFromWeekStart := int(todayWeekday - time.Monday - 1)
+	
+
+	startOfWeek := time.Now().AddDate(0, 0, -daysFromWeekStart)
+	
 	result := db.Table("transactions").Select("sum(sum)").Where(
 		"date > ? AND date <= ?",
-		time.Now().AddDate(0, 0, -7).Format("2006-01-02"),
-		time.Now().Format("2006-01-02"),
+		startOfWeek.Format("2006-01-02"),
+		today.Format("2006-01-02"),
 	)
 	result.Row().Scan(&sum)
 
@@ -58,10 +72,13 @@ func GetWeekSum() (int, error) {
 
 func GetMonthList() ([]Transaction, error) {
 	var transactions []Transaction
+	today := time.Now()
+	startOfMonth := time.Now().AddDate(0, 0, -today.Day())
+
 	result := db.Where(
 		"date > ? AND date <= ?",
-		time.Now().AddDate(0, -1, 0).Format("2006-01-02"),
-		time.Now().Format("2006-01-02"),
+		startOfMonth.Format("2006-01-02"),
+		today.Format("2006-01-02"),
 	).Find(&transactions)
 
 	return transactions, result.Error
@@ -69,10 +86,13 @@ func GetMonthList() ([]Transaction, error) {
 
 func GetMonthSum() (int, error) {
 	var sum int
+	today := time.Now()
+	startOfMonth := time.Now().AddDate(0, 0, -today.Day())
+	
 	result := db.Table("transactions").Select("sum(sum)").Where(
 		"date > ? AND date <= ?",
-		time.Now().AddDate(0, -1, 0).Format("2006-01-02"),
-		time.Now().Format("2006-01-02"),
+		startOfMonth.Format("2006-01-02"),
+		today.Format("2006-01-02"),
 	)
 	result.Row().Scan(&sum)
 
