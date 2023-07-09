@@ -118,7 +118,7 @@ func saveTransaction(c tele.Context) error {
 	t := repo.Transaction{
 		Sum: sum,
 		Description: found[0][2],
-		CreatedAt: time.Now().Format("2006-01-02"),
+		Date: time.Now().Format("2006-01-02"),
 	}
 	repo.SaveTransaction(t)
 

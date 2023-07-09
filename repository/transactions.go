@@ -2,13 +2,11 @@ package repository
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Transaction struct {
-	gorm.Model
-	CreatedAt   string
+	ID          uint `gorm:"primarykey"`
+	Date        string
 	Sum         int
 	Description string
 }
@@ -17,7 +15,7 @@ func GetTodayList() ([]Transaction, error) {
 	var transactions []Transaction
 	result := db.Find(
 		&transactions,
-		"created_at = ?",
+		"date = ?",
 		time.Now().Format("2006-01-02"),
 	)
 
@@ -27,7 +25,7 @@ func GetTodayList() ([]Transaction, error) {
 func GetTodaySum() (int, error) {
 	var sum int
 	result := db.Table("transactions").Select("sum(sum)").Where(
-		"created_at = ?",
+		"date = ?",
 		time.Now().Format("2006-01-02"),
 	)
 	result.Row().Scan(&sum)
@@ -38,7 +36,7 @@ func GetTodaySum() (int, error) {
 func GetWeekList() ([]Transaction, error) {
 	var transactions []Transaction
 	result := db.Where(
-		"created_at > ? AND created_at <= ?",
+		"date > ? AND date <= ?",
 		time.Now().AddDate(0, 0, -7).Format("2006-01-02"),
 		time.Now().Format("2006-01-02"),
 	).Find(&transactions)
@@ -49,7 +47,7 @@ func GetWeekList() ([]Transaction, error) {
 func GetWeekSum() (int, error) {
 	var sum int
 	result := db.Table("transactions").Select("sum(sum)").Where(
-		"created_at > ? AND created_at <= ?",
+		"date > ? AND date <= ?",
 		time.Now().AddDate(0, 0, -7).Format("2006-01-02"),
 		time.Now().Format("2006-01-02"),
 	)
@@ -61,7 +59,7 @@ func GetWeekSum() (int, error) {
 func GetMonthList() ([]Transaction, error) {
 	var transactions []Transaction
 	result := db.Where(
-		"created_at > ? AND created_at <= ?",
+		"date > ? AND date <= ?",
 		time.Now().AddDate(0, -1, 0).Format("2006-01-02"),
 		time.Now().Format("2006-01-02"),
 	).Find(&transactions)
@@ -72,7 +70,7 @@ func GetMonthList() ([]Transaction, error) {
 func GetMonthSum() (int, error) {
 	var sum int
 	result := db.Table("transactions").Select("sum(sum)").Where(
-		"created_at > ? AND created_at <= ?",
+		"date > ? AND date <= ?",
 		time.Now().AddDate(0, -1, 0).Format("2006-01-02"),
 		time.Now().Format("2006-01-02"),
 	)
