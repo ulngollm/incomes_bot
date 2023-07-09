@@ -35,23 +35,33 @@ func main() {
 		return
 	}
 
+	menu     := &tele.ReplyMarkup{}
+	btnSummaryDaily := menu.Data("More", "daily")
+
 	b.Handle("/today", func(c tele.Context) error {
+		sum, err := repo.GetTodaySum()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		message := fmt.Sprintf("Total: %d", sum)
+		menu.Inline(
+			menu.Row(btnSummaryDaily),
+		)
+
+		return c.Send(message, menu)
+	})
+
+	b.Handle(&btnSummaryDaily, func(c tele.Context) error {
 		transactions, err := repo.GetTodayList()
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		sum, err := repo.GetTodaySum()
-		if err != nil {
-			log.Fatal(err)
-		}
-		
-		// todo как показать кнопку
 		messageTitle := "Today's transactions"
 		message := fmt.Sprintf(
-			"%s: \n\nTotal: %d\n\n%v", 
+			"%s: \n\n%v", 
 			messageTitle, 
-			sum,
 			formatTransactions(transactions),
 		)
 
@@ -59,11 +69,6 @@ func main() {
 	})
 
 	b.Handle("/week", func(c tele.Context) error {
-		transactions, err := repo.GetWeekList()
-		if err != nil {
-			log.Fatal(err)
-		}
-
 		sum, err := repo.GetWeekSum()
 		if err != nil {
 			log.Fatal(err)
@@ -71,21 +76,15 @@ func main() {
 
 		messageTitle := "Weeks's transactions"
 		message := fmt.Sprintf(
-			"%s: \n\nTotal: %d\n\n%v", 
+			"%s: \n\nTotal: %d", 
 			messageTitle, 
 			sum,
-			formatTransactions(transactions),
 		)
 
 		return c.Send(message)
 	})
 
 	b.Handle("/month", func(c tele.Context) error {
-		transactions, err := repo.GetMonthList()
-		if err != nil {
-			log.Fatal(err)
-		}
-
 		sum, err := repo.GetMonthSum()
 		if err != nil {
 			log.Fatal(err)
@@ -93,10 +92,9 @@ func main() {
 
 		messageTitle := "Month's transactions"
 		message := fmt.Sprintf(
-			"%s: \n\nTotal: %d\n\n%v", 
+			"%s: \n\nTotal: %d", 
 			messageTitle, 
 			sum,
-			formatTransactions(transactions),
 		)
 
 		return c.Send(message)
