@@ -22,7 +22,6 @@ func init() {
 	}
 }
 
-
 func main() {
 	botToken := os.Getenv("TOKEN")
 	pref := tele.Settings{
@@ -35,7 +34,7 @@ func main() {
 		return
 	}
 
-	menu     := &tele.ReplyMarkup{}
+	menu := &tele.ReplyMarkup{}
 	btnSummaryDaily := menu.Data("More", "daily")
 
 	b.Handle("/today", func(c tele.Context) error {
@@ -60,8 +59,8 @@ func main() {
 
 		messageTitle := "Today's transactions"
 		message := fmt.Sprintf(
-			"%s: \n\n%v", 
-			messageTitle, 
+			"%s: \n\n%v",
+			messageTitle,
 			formatTransactions(transactions),
 		)
 
@@ -76,8 +75,8 @@ func main() {
 
 		messageTitle := "Weeks's transactions"
 		message := fmt.Sprintf(
-			"%s: \n\nTotal: %d", 
-			messageTitle, 
+			"%s: \n\nTotal: %d",
+			messageTitle,
 			sum,
 		)
 
@@ -92,8 +91,8 @@ func main() {
 
 		messageTitle := "Month's transactions"
 		message := fmt.Sprintf(
-			"%s: \n\nTotal: %d", 
-			messageTitle, 
+			"%s: \n\nTotal: %d",
+			messageTitle,
 			sum,
 		)
 
@@ -185,7 +184,6 @@ func CheckFormat(next tele.HandlerFunc) tele.HandlerFunc {
 		return next(c)
 	}
 }
-
 
 func formatTransactions(transactions []repo.Transaction) string {
 	if len(transactions) == 0 {
