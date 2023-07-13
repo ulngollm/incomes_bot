@@ -9,6 +9,7 @@ type Transaction struct {
 	Date        string
 	Sum         int
 	Description string
+	MessageId   uint
 }
 
 func GetTodayList() ([]Transaction, error) {
@@ -97,7 +98,7 @@ func SaveTransaction(t Transaction) (Transaction, error) {
 	return t, result.Error
 }
 
-func getStartOfWeek (today time.Time) time.Time {
+func getStartOfWeek(today time.Time) time.Time {
 	weekday := today.Weekday()
 	var daysFromWeekStart int
 	if weekday == 0 {
@@ -106,4 +107,11 @@ func getStartOfWeek (today time.Time) time.Time {
 		daysFromWeekStart = int(weekday) - 1
 	}
 	return today.AddDate(0, 0, -daysFromWeekStart)
+}
+
+func UpdateDateByMessageId(messageId uint, date time.Time) (bool, error) {
+	result := db.Model(&Transaction{}).Where("message_id = ?", messageId).Update("date", date.Format("2006-01-02"))
+	found := result.RowsAffected > 0
+
+	return found, result.Error
 }
