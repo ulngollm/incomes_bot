@@ -5,11 +5,12 @@ import (
 )
 
 type Transaction struct {
-	ID          uint `gorm:"primarykey"`
-	Date        string
-	Sum         int
-	Description string
-	MessageId   uint
+	ID        uint `gorm:"primarykey"`
+	UserId    uint
+	Date      string
+	Sum       int
+	Desc      string
+	MessageId uint
 }
 
 func GetTodayList() ([]Transaction, error) {

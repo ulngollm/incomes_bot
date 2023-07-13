@@ -49,7 +49,7 @@ func main() {
 		)
 
 		return c.Send(message, menu)
-	})
+	}, CheckAccess)
 
 	b.Handle(&btnSummaryDaily, func(c tele.Context) error {
 		transactions, err := repo.GetTodayList()
@@ -65,7 +65,7 @@ func main() {
 		)
 
 		return c.Send(message)
-	})
+	}, CheckAccess)
 
 	b.Handle("/week", func(c tele.Context) error {
 		sum, err := repo.GetWeekSum()
@@ -81,7 +81,7 @@ func main() {
 		)
 
 		return c.Send(message)
-	})
+	}, CheckAccess)
 
 	b.Handle("/month", func(c tele.Context) error {
 		sum, err := repo.GetMonthSum()
@@ -97,9 +97,9 @@ func main() {
 		)
 
 		return c.Send(message)
-	})
+	}, CheckAccess)
 
-	b.Handle(tele.OnText, saveTransaction, CheckChangeDateRequest, CheckFormat)
+	b.Handle(tele.OnText, saveTransaction, CheckAccess, CheckChangeDateRequest, CheckFormat)
 
 	b.Start()
 }
@@ -114,10 +114,10 @@ func saveTransaction(c tele.Context) error {
 
 	sum, _ := strconv.Atoi(found[0][1])
 	t := repo.Transaction{
-		Sum:         sum,
-		Description: found[0][2],
-		Date:        time.Now().Format("2006-01-02"),
-		MessageId:   uint(c.Message().ID),
+		Sum:       sum,
+		Desc:      found[0][2],
+		Date:      time.Now().Format("2006-01-02"),
+		MessageId: uint(c.Message().ID),
 	}
 	repo.SaveTransaction(t)
 
@@ -185,6 +185,19 @@ func CheckFormat(next tele.HandlerFunc) tele.HandlerFunc {
 	}
 }
 
+func CheckAccess(next tele.HandlerFunc) tele.HandlerFunc {
+	return func(c tele.Context) error {
+		allowedUserId, _ := strconv.Atoi(os.Getenv("USER"))
+		userId := int(c.Message().Chat.ID)
+		if userId != allowedUserId {
+			c.Send("Access denied!")
+			return nil
+		}
+
+		return next(c)
+	}
+}
+
 func formatTransactions(transactions []repo.Transaction) string {
 	if len(transactions) == 0 {
 		return "no transactions"
@@ -192,7 +205,7 @@ func formatTransactions(transactions []repo.Transaction) string {
 
 	fmtTransactions := make([]string, len(transactions))
 	for i, t := range transactions {
-		fmtTransactions[i] = fmt.Sprintf("%d %s", t.Sum, t.Description)
+		fmtTransactions[i] = fmt.Sprintf("%d %s", t.Sum, t.Desc)
 	}
 
 	return strings.Join(fmtTransactions, "\n")
