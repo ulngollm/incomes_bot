@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"gorm.io/driver/sqlite"
+	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
-	_ "modernc.org/sqlite"
 )
 
 var db *gorm.DB
