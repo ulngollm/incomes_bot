@@ -15,80 +15,86 @@ type Transaction struct {
 	MessageId uint
 }
 
-func GetTodayList() ([]Transaction, error) {
+func GetTodayList(userId uint) ([]Transaction, error) {
 	var transactions []Transaction
 	result := db.Find(
 		&transactions,
-		"date = ?",
+		"date = ? AND user_id = ?",
 		time.Now().Format(DB_DATE_FORMAT),
+		userId,
 	)
 
 	return transactions, result.Error
 }
 
-func GetTodaySum() (int, error) {
+func GetTodaySum(userId uint) (int, error) {
 	var sum int
 	result := db.Table("transactions").Select("sum(sum)").Where(
-		"date = ?",
+		"date = ? AND user_id = ?",
 		time.Now().Format(DB_DATE_FORMAT),
+		userId,
 	)
 	result.Row().Scan(&sum)
 
 	return sum, result.Error
 }
 
-func GetWeekList() ([]Transaction, error) {
+func GetWeekList(userId uint) ([]Transaction, error) {
 	var transactions []Transaction
 	today := time.Now()
 	startOfWeek := getStartOfWeek(today)
 
 	result := db.Where(
-		"date >= ? AND date <= ?",
+		"date >= ? AND date <= ? AND user_id = ?",
 		startOfWeek.Format(DB_DATE_FORMAT),
 		today.Format(DB_DATE_FORMAT),
+		userId,
 	).Find(&transactions)
 
 	return transactions, result.Error
 }
 
-func GetWeekSum() (int, error) {
+func GetWeekSum(userId uint) (int, error) {
 	var sum int
 	today := time.Now()
 	startOfWeek := getStartOfWeek(today)
 
 	result := db.Table("transactions").Select("sum(sum)").Where(
-		"date >= ? AND date <= ?",
+		"date >= ? AND date <= ? AND user_id = ?",
 		startOfWeek.Format(DB_DATE_FORMAT),
 		today.Format(DB_DATE_FORMAT),
+		userId,
 	)
 	result.Row().Scan(&sum)
 
 	return sum, result.Error
 }
 
-func GetMonthList() ([]Transaction, error) {
+func GetMonthList(userId uint) ([]Transaction, error) {
 	var transactions []Transaction
 	today := time.Now()
 	startOfMonth := time.Now().AddDate(0, 0, -today.Day())
 
 	result := db.Where(
-		"date > ? AND date <= ?",
+		"date > ? AND date <= ? AND user_id = ?",
 		startOfMonth.Format(DB_DATE_FORMAT),
 		today.Format(DB_DATE_FORMAT),
+		userId,
 	).Find(&transactions)
 
 	return transactions, result.Error
 }
 
-func GetMonthSum() (int, error) {
+func GetMonthSum(userId uint) (int, error) {
 	var sum int
 	today := time.Now()
 	startOfMonth := time.Now().AddDate(0, 0, -today.Day())
 
 	result := db.Table("transactions").Select("sum(sum)").Where(
-		"date > ? AND date <= ?",
+		"date > ? AND date <= ? AND user_id = ?",
 		startOfMonth.Format(DB_DATE_FORMAT),
 		today.Format(DB_DATE_FORMAT),
+		userId,
 	)
 	result.Row().Scan(&sum)
 
@@ -112,9 +118,13 @@ func getStartOfWeek(today time.Time) time.Time {
 	return today.AddDate(0, 0, -daysFromWeekStart)
 }
 
-func UpdateDateByMessageId(messageId uint, date time.Time) (bool, error) {
+func UpdateDateByMessageId(messageId uint, date time.Time, userId uint) (bool, error) {
 	newDate := date.Format(DB_DATE_FORMAT)
-	result := db.Model(&Transaction{}).Where("message_id = ?", messageId).Update("date", newDate)
+	result := db.Model(&Transaction{}).Where(
+		"message_id = ? AND user_id = ?", 
+		messageId,
+		userId,
+	).Update("date", newDate)
 	found := result.RowsAffected > 0
 
 	return found, result.Error

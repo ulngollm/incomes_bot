@@ -38,7 +38,7 @@ func main() {
 	btnSummaryDaily := menu.Data("More", "daily")
 
 	b.Handle("/today", func(c tele.Context) error {
-		sum, err := repo.GetTodaySum()
+		sum, err := repo.GetTodaySum(getCurrentUser(c))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -52,7 +52,7 @@ func main() {
 	}, CheckAccess)
 
 	b.Handle(&btnSummaryDaily, func(c tele.Context) error {
-		transactions, err := repo.GetTodayList()
+		transactions, err := repo.GetTodayList(getCurrentUser(c))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -68,7 +68,7 @@ func main() {
 	}, CheckAccess)
 
 	b.Handle("/week", func(c tele.Context) error {
-		sum, err := repo.GetWeekSum()
+		sum, err := repo.GetWeekSum(getCurrentUser(c))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -84,7 +84,7 @@ func main() {
 	}, CheckAccess)
 
 	b.Handle("/month", func(c tele.Context) error {
-		sum, err := repo.GetMonthSum()
+		sum, err := repo.GetMonthSum(getCurrentUser(c))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -118,6 +118,7 @@ func saveTransaction(c tele.Context) error {
 		Desc:      found[0][2],
 		Date:      time.Now().Format("2006-01-02"),
 		MessageId: uint(c.Message().ID),
+		UserId:    getCurrentUser(c),
 	}
 	repo.SaveTransaction(t)
 
@@ -137,7 +138,11 @@ func changeDate(c tele.Context) error {
 		date = date.AddDate(year, 0, 0)
 	}
 
-	transactionExists, err := repo.UpdateDateByMessageId(messageId, date)
+	transactionExists, err := repo.UpdateDateByMessageId(
+		messageId,
+		date,
+		getCurrentUser(c),
+	)
 	if !transactionExists {
 		return c.Send("Transaction not found")
 	}
@@ -187,15 +192,17 @@ func CheckFormat(next tele.HandlerFunc) tele.HandlerFunc {
 
 func CheckAccess(next tele.HandlerFunc) tele.HandlerFunc {
 	return func(c tele.Context) error {
-		allowedUserId := os.Getenv("USER_ID")
-		userId := int(c.Message().Chat.ID)
-		if fmt.Sprintf("%d", userId) != allowedUserId {
+		if false {
 			c.Send("Access denied!")
 			return nil
 		}
 
 		return next(c)
 	}
+}
+
+func getCurrentUser(c tele.Context) uint {
+	return uint(c.Message().Chat.ID)
 }
 
 func formatTransactions(transactions []repo.Transaction) string {
