@@ -127,13 +127,13 @@ func saveTransaction(c tele.Context) error {
 func changeDate(c tele.Context) error {
 	messageId := uint(c.Message().ReplyTo.ID)
 
-	dateRegex := regexp.MustCompile(`(\d{2}.\d{2})`)
+	dateRegex := regexp.MustCompile(`(\d{2}\.\d{2})`)
 	dateFound := dateRegex.FindAllString(c.Text(), -1)
 
 	date := time.Now()
 	if dateFound != nil {
 		year := date.Year()
-		date, _ = time.Parse("01.02", dateFound[0])
+		date, _ = time.Parse("02.01", dateFound[0])
 		date = date.AddDate(year, 0, 0)
 	}
 
@@ -152,7 +152,7 @@ func changeDate(c tele.Context) error {
 func CheckChangeDateRequest(next tele.HandlerFunc) tele.HandlerFunc {
 	return func(c tele.Context) error {
 		if c.Message().ReplyTo != nil {
-			found, err := regexp.MatchString(`^\d{2}.\d{2}$`, c.Text())
+			found, err := regexp.MatchString(`^\d{2}\.\d{2}$`, c.Text())
 			if err != nil {
 				log.Println(err)
 			}
@@ -187,9 +187,9 @@ func CheckFormat(next tele.HandlerFunc) tele.HandlerFunc {
 
 func CheckAccess(next tele.HandlerFunc) tele.HandlerFunc {
 	return func(c tele.Context) error {
-		allowedUserId, _ := strconv.Atoi(os.Getenv("USER"))
+		allowedUserId := os.Getenv("USER_ID")
 		userId := int(c.Message().Chat.ID)
-		if userId != allowedUserId {
+		if fmt.Sprintf("%d", userId) != allowedUserId {
 			c.Send("Access denied!")
 			return nil
 		}

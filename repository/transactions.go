@@ -4,6 +4,8 @@ import (
 	"time"
 )
 
+const DB_DATE_FORMAT = "2006-01-02"
+
 type Transaction struct {
 	ID        uint `gorm:"primarykey"`
 	UserId    uint
@@ -18,7 +20,7 @@ func GetTodayList() ([]Transaction, error) {
 	result := db.Find(
 		&transactions,
 		"date = ?",
-		time.Now().Format("2006-01-02"),
+		time.Now().Format(DB_DATE_FORMAT),
 	)
 
 	return transactions, result.Error
@@ -28,7 +30,7 @@ func GetTodaySum() (int, error) {
 	var sum int
 	result := db.Table("transactions").Select("sum(sum)").Where(
 		"date = ?",
-		time.Now().Format("2006-01-02"),
+		time.Now().Format(DB_DATE_FORMAT),
 	)
 	result.Row().Scan(&sum)
 
@@ -42,8 +44,8 @@ func GetWeekList() ([]Transaction, error) {
 
 	result := db.Where(
 		"date >= ? AND date <= ?",
-		startOfWeek.Format("2006-01-02"),
-		today.Format("2006-01-02"),
+		startOfWeek.Format(DB_DATE_FORMAT),
+		today.Format(DB_DATE_FORMAT),
 	).Find(&transactions)
 
 	return transactions, result.Error
@@ -56,8 +58,8 @@ func GetWeekSum() (int, error) {
 
 	result := db.Table("transactions").Select("sum(sum)").Where(
 		"date >= ? AND date <= ?",
-		startOfWeek.Format("2006-01-02"),
-		today.Format("2006-01-02"),
+		startOfWeek.Format(DB_DATE_FORMAT),
+		today.Format(DB_DATE_FORMAT),
 	)
 	result.Row().Scan(&sum)
 
@@ -71,8 +73,8 @@ func GetMonthList() ([]Transaction, error) {
 
 	result := db.Where(
 		"date > ? AND date <= ?",
-		startOfMonth.Format("2006-01-02"),
-		today.Format("2006-01-02"),
+		startOfMonth.Format(DB_DATE_FORMAT),
+		today.Format(DB_DATE_FORMAT),
 	).Find(&transactions)
 
 	return transactions, result.Error
@@ -85,8 +87,8 @@ func GetMonthSum() (int, error) {
 
 	result := db.Table("transactions").Select("sum(sum)").Where(
 		"date > ? AND date <= ?",
-		startOfMonth.Format("2006-01-02"),
-		today.Format("2006-01-02"),
+		startOfMonth.Format(DB_DATE_FORMAT),
+		today.Format(DB_DATE_FORMAT),
 	)
 	result.Row().Scan(&sum)
 
@@ -111,7 +113,8 @@ func getStartOfWeek(today time.Time) time.Time {
 }
 
 func UpdateDateByMessageId(messageId uint, date time.Time) (bool, error) {
-	result := db.Model(&Transaction{}).Where("message_id = ?", messageId).Update("date", date.Format("2006-01-02"))
+	newDate := date.Format(DB_DATE_FORMAT)
+	result := db.Model(&Transaction{}).Where("message_id = ?", messageId).Update("date", newDate)
 	found := result.RowsAffected > 0
 
 	return found, result.Error
