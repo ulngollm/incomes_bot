@@ -8,11 +8,11 @@ const DB_DATE_FORMAT = "2006-01-02"
 
 type Transaction struct {
 	ID        uint `gorm:"primarykey"`
-	UserId    uint
-	Date      string
-	Sum       int
-	Desc      string
+	UserId    uint `gorm:"-:migration"`
+	Sum       int `gorm:"-:migration"`
+	Desc      string `gorm:"-:migration"`
 	MessageId uint
+	Date      string `gorm:"type:int"` 
 }
 
 func GetTodayList(userId uint) ([]Transaction, error) {
