@@ -51,6 +51,17 @@ func main() {
 		return c.Send(message, menu)
 	}, CheckAccess)
 
+	b.Handle("/yesterday", func(c tele.Context) error {
+		sum, err := repo.GetYesterdaySum(getCurrentUser(c))
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		message := fmt.Sprintf("Total: %d", sum)
+
+		return c.Send(message, menu)
+	}, CheckAccess)
+
 	b.Handle(&btnSummaryDaily, func(c tele.Context) error {
 		transactions, err := repo.GetTodayList(getCurrentUser(c))
 		if err != nil {

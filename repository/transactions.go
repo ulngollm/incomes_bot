@@ -39,6 +39,18 @@ func GetTodaySum(userId uint) (int, error) {
 	return sum, result.Error
 }
 
+func GetYesterdaySum(userId uint) (int, error) {
+	var sum int
+	result := db.Table("transactions").Select("sum(sum)").Where(
+		"date = ? AND user_id = ?",
+		time.Now().AddDate(0,0, -1).Format(DB_DATE_FORMAT),
+		userId,
+	)
+	result.Row().Scan(&sum)
+
+	return sum, result.Error
+}
+
 func GetWeekList(userId uint) ([]Transaction, error) {
 	var transactions []Transaction
 	today := time.Now()
