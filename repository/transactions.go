@@ -107,17 +107,6 @@ func SaveTransaction(t Transaction) (Transaction, error) {
 	return t, result.Error
 }
 
-func getStartOfWeek(today time.Time) time.Time {
-	weekday := today.Weekday()
-	var daysFromWeekStart int
-	if weekday == 0 {
-		daysFromWeekStart = 7 - 1
-	} else {
-		daysFromWeekStart = int(weekday) - 1
-	}
-	return today.AddDate(0, 0, -daysFromWeekStart)
-}
-
 func UpdateDateByMessageId(messageId uint, date time.Time, userId uint) (bool, error) {
 	newDate := date.Format(DB_DATE_FORMAT)
 	result := db.Model(&Transaction{}).Where(
@@ -129,3 +118,27 @@ func UpdateDateByMessageId(messageId uint, date time.Time, userId uint) (bool, e
 
 	return found, result.Error
 }
+
+func DeleteTransaction(userId uint, messageId uint) (bool, error) {
+	result := db.Where(
+		"message_id = ? AND user_id = ?", 
+		messageId,
+		userId,
+	).Delete(&Transaction{})
+	found := result.RowsAffected > 0
+
+	return found, result.Error
+}
+
+func getStartOfWeek(today time.Time) time.Time {
+	weekday := today.Weekday()
+	var daysFromWeekStart int
+	if weekday == 0 {
+		daysFromWeekStart = 7 - 1
+	} else {
+		daysFromWeekStart = int(weekday) - 1
+	}
+	return today.AddDate(0, 0, -daysFromWeekStart)
+}
+
+

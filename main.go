@@ -99,6 +99,20 @@ func main() {
 		return c.Send(message)
 	}, CheckAccess)
 
+	b.Handle("/delete", func(c tele.Context) error {
+		messageId := uint(c.Message().ReplyTo.ID)
+		transactionExists, err := repo.DeleteTransaction(getCurrentUser(c), messageId)
+		if !transactionExists {
+			return c.Send("Transaction not found")
+		}
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		return c.Send("Deleted!")
+	})
+
 	b.Handle(tele.OnText, saveTransaction, CheckAccess, CheckChangeDateRequest, CheckFormat)
 
 	b.Start()
