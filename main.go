@@ -111,6 +111,10 @@ func main() {
 	}, CheckAccess)
 
 	b.Handle("/delete", func(c tele.Context) error {
+		if c.Message().ReplyTo == nil {
+			return c.Send("Transaction not specified. Please make reply of  message you want to delete")
+		}
+
 		messageId := uint(c.Message().ReplyTo.ID)
 		transactionExists, err := repo.DeleteTransaction(getCurrentUser(c), messageId)
 		if !transactionExists {
