@@ -35,7 +35,7 @@ func main() {
 	}
 
 	menu := &tele.ReplyMarkup{}
-	btnSummaryDaily := menu.Data("More", "daily")
+	btnSummary := menu.Data("More", "summary")
 
 	b.Handle("/today", func(c tele.Context) error {
 		sum, err := repo.GetTodaySum(getCurrentUser(c))
@@ -44,8 +44,9 @@ func main() {
 		}
 
 		message := fmt.Sprintf("Total: %d", sum)
+		btnSummary.Data = "today"
 		menu.Inline(
-			menu.Row(btnSummaryDaily),
+			menu.Row(btnSummary),
 		)
 
 		return c.Send(message, menu)
@@ -58,17 +59,26 @@ func main() {
 		}
 
 		message := fmt.Sprintf("Total: %d", sum)
+		btnSummary.Data = "yesterday"
+		menu.Inline(
+			menu.Row(btnSummary),
+		)
 
 		return c.Send(message, menu)
 	}, CheckAccess)
 
-	b.Handle(&btnSummaryDaily, func(c tele.Context) error {
-		transactions, err := repo.GetTodayList(getCurrentUser(c))
+	b.Handle(&btnSummary, func(c tele.Context) error {
+		summaryHandler := repo.GetTodayList
+		if btnSummary.Data == "yesterday" {
+			summaryHandler = repo.GetYesterdayList
+		}
+		transactions, err := summaryHandler(getCurrentUser(c))
+
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		messageTitle := "Today's transactions"
+		messageTitle := "Transactions"
 		message := fmt.Sprintf(
 			"%s: \n\n%v",
 			messageTitle,

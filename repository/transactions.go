@@ -7,12 +7,12 @@ import (
 const DB_DATE_FORMAT = "2006-01-02"
 
 type Transaction struct {
-	ID        uint `gorm:"primarykey"`
-	UserId    uint `gorm:"-:migration"`
-	Sum       int `gorm:"-:migration"`
+	ID        uint   `gorm:"primarykey"`
+	UserId    uint   `gorm:"-:migration"`
+	Sum       int    `gorm:"-:migration"`
 	Desc      string `gorm:"-:migration"`
 	MessageId uint
-	Date      string `gorm:"type:int"` 
+	Date      string `gorm:"type:int"`
 }
 
 func GetTodayList(userId uint) ([]Transaction, error) {
@@ -21,6 +21,18 @@ func GetTodayList(userId uint) ([]Transaction, error) {
 		&transactions,
 		"date = ? AND user_id = ?",
 		time.Now().Format(DB_DATE_FORMAT),
+		userId,
+	)
+
+	return transactions, result.Error
+}
+
+func GetYesterdayList(userId uint) ([]Transaction, error) {
+	var transactions []Transaction
+	result := db.Find(
+		&transactions,
+		"date = ? AND user_id = ?",
+		time.Now().AddDate(0, 0, -1).Format(DB_DATE_FORMAT),
 		userId,
 	)
 
@@ -43,7 +55,7 @@ func GetYesterdaySum(userId uint) (int, error) {
 	var sum int
 	result := db.Table("transactions").Select("sum(sum)").Where(
 		"date = ? AND user_id = ?",
-		time.Now().AddDate(0,0, -1).Format(DB_DATE_FORMAT),
+		time.Now().AddDate(0, 0, -1).Format(DB_DATE_FORMAT),
 		userId,
 	)
 	result.Row().Scan(&sum)
@@ -122,7 +134,7 @@ func SaveTransaction(t Transaction) (Transaction, error) {
 func UpdateDateByMessageId(messageId uint, date time.Time, userId uint) (bool, error) {
 	newDate := date.Format(DB_DATE_FORMAT)
 	result := db.Model(&Transaction{}).Where(
-		"message_id = ? AND user_id = ?", 
+		"message_id = ? AND user_id = ?",
 		messageId,
 		userId,
 	).Update("date", newDate)
@@ -133,7 +145,7 @@ func UpdateDateByMessageId(messageId uint, date time.Time, userId uint) (bool, e
 
 func DeleteTransaction(userId uint, messageId uint) (bool, error) {
 	result := db.Where(
-		"message_id = ? AND user_id = ?", 
+		"message_id = ? AND user_id = ?",
 		messageId,
 		userId,
 	).Delete(&Transaction{})
@@ -152,5 +164,3 @@ func getStartOfWeek(today time.Time) time.Time {
 	}
 	return today.AddDate(0, 0, -daysFromWeekStart)
 }
-
-
